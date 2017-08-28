@@ -46,6 +46,6 @@ module "k8s" {
 
 ## Resources created
 
-- [`module.master-mig`](https://github.com/danisla/terraform-google-managed-instance-group): Managed instance group for the master node.
-- [`module.default-pool-mig`](https://github.com/danisla/terraform-google-managed-instance-group): Managed instance group for the nodes.
+- [`module.master-mig`](https://github.com/GoogleCloudPlatform/terraform-google-managed-instance-group): Managed instance group for the master node.
+- [`module.default-pool-mig`](https://github.com/GoogleCloudPlatform/terraform-google-managed-instance-group): Managed instance group for the nodes.
 - [`google_compute_firewall.k8s-all`](https://www.terraform.io/docs/providers/google/r/compute_firewall.html): Firewall rule to allow all traffic on the pod network.
