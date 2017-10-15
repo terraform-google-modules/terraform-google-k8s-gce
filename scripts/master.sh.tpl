@@ -10,6 +10,7 @@ networking:
   serviceSubnet: ${service_cidr}
   podSubnet: ${pod_cidr}
 authorizationModes:
+- Node
 - RBAC
 apiServerCertSANs:
 - 127.0.0.1
@@ -18,7 +19,7 @@ controllerManagerExtraArgs:
   allocate-node-cidrs: "true"
   cidr-allocator-type: "RangeAllocator"
   configure-cloud-routes: "true"
-  cloud-config: /etc/kubernetes/gce.conf
+  cloud-config: /etc/kubernetes/pki/gce.conf
   cluster-cidr: ${pod_cidr}
   service-cluster-ip-range: ${service_cidr}
   feature-gates: AllAlpha=true,RotateKubeletServerCertificate=false,RotateKubeletClientCertificate=false,ExperimentalCriticalPodAnnotation=true
@@ -30,8 +31,12 @@ kubeadm init --config /etc/kubernetes/kubeadm.conf
 export KUBECONFIG=/etc/kubernetes/admin.conf
 
 if [ "${pod_network_type}" == "calico" ]; then
+  manifest_version=
+  [[ ${calico_version} =~ ^2.4 ]] && manifest_version=1.6
+  [[ ${calico_version} =~ ^2.6 ]] && manifest_version=1.7
+  [[ -z $${manifest_version} ]] && echo "ERROR: Unsupported calico version: ${calico_version}" && exit 1
   kubectl apply -f https://docs.projectcalico.org/v${calico_version}/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
-  kubectl apply -f https://docs.projectcalico.org/v${calico_version}/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.6/calico.yaml
+  kubectl apply -f https://docs.projectcalico.org/v${calico_version}/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/$${manifest_version}/calico.yaml
 fi
 
 # kubeadm manages the manifests directory, so add configmap after the init returns.
@@ -47,11 +52,11 @@ data:
 EOF
 
 # Install L7 GLBC controller, path glbc.manifest to support kubeadm cluster.
-curl -sL https://raw.githubusercontent.com/kubernetes/kubernetes/v${k8s_version}/cluster/saltbase/salt/l7-gcp/glbc.manifest | \
+curl -sL https://raw.githubusercontent.com/kubernetes/kubernetes/v${k8s_version}/cluster/saltbase/salt/l7-gcp/glbc.manifest > /tmp/glbc.manifest
+kubectl convert -f /tmp/glbc.manifest -o json | jq '.spec.volumes |= . + [{"name": "kubeconfig", "hostPath": {"path": "/etc/kubernetes/admin.conf", "type": "File"}}] | .spec.containers[0].volumeMounts |= . + [{"name": "kubeconfig", "readOnly": true, "mountPath": "/etc/kubernetes/admin.conf"}]' | \
   sed \
     -e 's|--apiserver-host=http://localhost:8080|--apiserver-host=https://127.0.0.1:6443|g' \
-    -e 's|--config-file-path=/etc/gce.conf|--config-file-path=/etc/kubernetes/gce.conf|g' \
-    -e 's|: /etc/gce.conf|: /etc/kubernetes|g' \
+    -e 's|--verbose=true|--verbose=true --kubeconfig=/etc/kubernetes/admin.conf|g' \
     > /etc/kubernetes/manifests/glbc.manifest
 chmod 0600 /etc/kubernetes/manifests/glbc.manifest
 

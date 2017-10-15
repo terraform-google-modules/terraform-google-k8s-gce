@@ -38,6 +38,8 @@ module "k8s" {
 - `service_cidr` (optional): The CIDR for the service network. Default is `10.25.240.0/20`.
 - `dns_ip` (optional): The IP of the kube DNS service, must live within the service_cidr. Default is `10.25.240.10`.
 - `depends_id` (optional): The ID of a resource that the instance group depends on. This is added as metadata `tf_depends_id` on each instance.
+- `pod_network_type` (optional): The type of networking to use for inter-pod traffic. Either kubenet or calico.
+- `calico_version` (optional): Version of Calico to install for pod networking. Major and minor version only, example: `2.4` or `2.6`.
 
 ### Output variables
 

@@ -15,6 +15,7 @@ sudo add-apt-repository \
 sudo apt-get update
 
 sudo apt-get install -y \
+  jq \
   docker-ce=${docker_version}* \
   kubelet=${k8s_version}* \
   kubeadm=${k8s_version}* \
@@ -42,6 +43,10 @@ node-tags = ${tags}
 node-instance-prefix = ${instance_prefix}
 EOF
 cp /etc/kubernetes/gce.conf /etc/gce.conf
+
+# kubeadm 1.8 workaround for https://github.com/kubernetes/release/issues/406
+mkdir -p /etc/kubernetes/pki
+cp /etc/kubernetes/gce.conf /etc/kubernetes/pki/gce.conf
 
 # for GLBC
 touch /var/log/glbc.log
