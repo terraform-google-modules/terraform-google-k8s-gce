@@ -52,11 +52,11 @@ data:
 EOF
 
 # Install L7 GLBC controller, path glbc.manifest to support kubeadm cluster.
-curl -sL https://raw.githubusercontent.com/kubernetes/kubernetes/v${k8s_version}/cluster/saltbase/salt/l7-gcp/glbc.manifest | \
+curl -sL https://raw.githubusercontent.com/kubernetes/kubernetes/v${k8s_version}/cluster/saltbase/salt/l7-gcp/glbc.manifest > /tmp/glbc.manifest
+kubectl convert -f /tmp/glbc.manifest -o json | jq '.spec.volumes |= . + [{"name": "kubeconfig", "hostPath": {"path": "/etc/kubernetes/admin.conf", "type": "File"}}] | .spec.containers[0].volumeMounts |= . + [{"name": "kubeconfig", "readOnly": true, "mountPath": "/etc/kubernetes/admin.conf"}]' | \
   sed \
     -e 's|--apiserver-host=http://localhost:8080|--apiserver-host=https://127.0.0.1:6443|g' \
-    -e 's|--config-file-path=/etc/gce.conf|--config-file-path=/etc/kubernetes/gce.conf|g' \
-    -e 's|: /etc/gce.conf|: /etc/kubernetes|g' \
+    -e 's|--verbose=true|--verbose=true --kubeconfig=/etc/kubernetes/admin.conf|g' \
     > /etc/kubernetes/manifests/glbc.manifest
 chmod 0600 /etc/kubernetes/manifests/glbc.manifest
 

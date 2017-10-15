@@ -25,7 +25,7 @@ variable cluster_uid {
 
 variable k8s_version {
   description = "The version of kubernetes to use. See available versions using: `apt-cache madison kubelet`"
-  default     = "1.7.4"
+  default     = "1.8.1"
 }
 
 variable dashboard_version {
@@ -40,12 +40,12 @@ variable cni_version {
 
 variable docker_version {
   description = "The version of Docker to install. See available versions using: `apt-cache madison docker-ce`"
-  default     = "17.06.0"
+  default     = "17.09.0"
 }
 
 variable calico_version {
   description = "Version of Calico to install for pod networking. Major and minor version only, example: `2.4` or `2.6`."
-  default     = "2.4"
+  default     = "2.6"
 }
 
 variable compute_image {
