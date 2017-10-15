@@ -11,7 +11,7 @@ module "k8s" {
   network     = "k8s"
   region      = "${var.region}"
   zone        = "${var.zone}"
-  k8s_version = "1.7.3"
+  k8s_version = "1.8.1"
   num_nodes   = "${var.num_nodes}"
 }
 ```
