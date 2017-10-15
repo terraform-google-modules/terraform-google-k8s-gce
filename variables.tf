@@ -44,7 +44,7 @@ variable docker_version {
 }
 
 variable calico_version {
-  description = "Version of Calico to install for pod networking."
+  description = "Version of Calico to install for pod networking. Major and minor version only, example: `2.4` or `2.6`."
   default     = "2.4"
 }
 

@@ -10,6 +10,7 @@ networking:
   serviceSubnet: ${service_cidr}
   podSubnet: ${pod_cidr}
 authorizationModes:
+- Node
 - RBAC
 apiServerCertSANs:
 - 127.0.0.1
@@ -18,7 +19,7 @@ controllerManagerExtraArgs:
   allocate-node-cidrs: "true"
   cidr-allocator-type: "RangeAllocator"
   configure-cloud-routes: "true"
-  cloud-config: /etc/kubernetes/gce.conf
+  cloud-config: /etc/kubernetes/pki/gce.conf
   cluster-cidr: ${pod_cidr}
   service-cluster-ip-range: ${service_cidr}
   feature-gates: AllAlpha=true,RotateKubeletServerCertificate=false,RotateKubeletClientCertificate=false,ExperimentalCriticalPodAnnotation=true
@@ -30,8 +31,12 @@ kubeadm init --config /etc/kubernetes/kubeadm.conf
 export KUBECONFIG=/etc/kubernetes/admin.conf
 
 if [ "${pod_network_type}" == "calico" ]; then
+  manifest_version=
+  [[ ${calico_version} =~ ^2.4 ]] && manifest_version=1.6
+  [[ ${calico_version} =~ ^2.6 ]] && manifest_version=1.7
+  [[ -z $${manifest_version} ]] && echo "ERROR: Unsupported calico version: ${calico_version}" && exit 1
   kubectl apply -f https://docs.projectcalico.org/v${calico_version}/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
-  kubectl apply -f https://docs.projectcalico.org/v${calico_version}/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.6/calico.yaml
+  kubectl apply -f https://docs.projectcalico.org/v${calico_version}/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/$${manifest_version}/calico.yaml
 fi
 
 # kubeadm manages the manifests directory, so add configmap after the init returns.
