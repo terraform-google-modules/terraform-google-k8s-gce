@@ -6,7 +6,7 @@ Modular Kubernetes Cluster for GCE.
 
 ```ruby
 module "k8s" {
-  source      = "/Users/disla/Projects/terraform-google-modules/terraform-google-k8s-gce"
+  source      = "github.com/GoogleCloudPlatform/terraform-google-k8s-gce"
   name        = "dev"
   network     = "k8s"
   region      = "${var.region}"
