@@ -16,6 +16,7 @@ sudo apt-get update
 
 sudo apt-get install -y \
   jq \
+  nginx \
   docker-ce=${docker_version}* \
   kubelet=${k8s_version}* \
   kubeadm=${k8s_version}* \
