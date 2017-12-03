@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
+data "google_client_config" "current" {}
+
 data "template_file" "core-init" {
   template = "${file("${format("%s/scripts/k8s-core.sh.tpl", path.module)}")}"
 
   vars {
-    dns_ip           = "${var.dns_ip}"
-    docker_version   = "${var.docker_version}"
-    k8s_version      = "${var.k8s_version}"
-    cni_version      = "${var.cni_version}"
-    tags             = "${random_id.instance-prefix.hex}"
-    instance_prefix  = "${random_id.instance-prefix.hex}"
-    pod_network_type = "${var.pod_network_type}"
+    dns_ip               = "${var.dns_ip}"
+    docker_version       = "${var.docker_version}"
+    k8s_version          = "${replace(var.k8s_version, "^v", "")}"
+    k8s_version_override = "${var.k8s_version_override == "" ? replace(var.k8s_version, "^v", "") : replace(var.k8s_version_override, "^v", "")}"
+    cni_version          = "${var.cni_version}"
+    tags                 = "${random_id.instance-prefix.hex}"
+    instance_prefix      = "${random_id.instance-prefix.hex}"
+    pod_network_type     = "${var.pod_network_type}"
+    project_id           = "${data.google_client_config.current.project}"
+    network_name         = "${var.network}"
+    subnetwork_name      = "${var.subnetwork}"
+    gce_conf_add         = "${var.gce_conf_add}"
   }
 }
 
@@ -32,7 +39,7 @@ data "template_file" "master-bootstrap" {
   template = "${file("${format("%s/scripts/master.sh.tpl", path.module)}")}"
 
   vars {
-    k8s_version       = "${var.k8s_version}"
+    k8s_version       = "${var.k8s_version_override == "" ? replace(var.k8s_version, "^v", "") : replace(var.k8s_version_override, "^v", "")}"
     dashboard_version = "${var.dashboard_version}"
     calico_version    = "${var.calico_version}"
     pod_cidr          = "${var.pod_cidr}"
@@ -41,6 +48,7 @@ data "template_file" "master-bootstrap" {
     cluster_uid       = "${var.cluster_uid == "" ? random_id.cluster-uid.hex : var.cluster_uid}"
     instance_prefix   = "${random_id.instance-prefix.hex}"
     pod_network_type  = "${var.pod_network_type}"
+    feature_gates     = "${var.feature_gates}"
   }
 }
 
@@ -48,7 +56,7 @@ data "template_file" "node-bootstrap" {
   template = "${file("${format("%s/scripts/node.sh.tpl", path.module)}")}"
 
   vars {
-    master_ip = "${var.master_ip}"
+    master_ip = "${var.master_ip == "" ? lookup(var.region_params["${var.region}"], "master_ip") : var.master_ip}"
     token     = "${random_id.token-part-1.hex}.${random_id.token-part-2.hex}"
   }
 }
@@ -134,13 +142,13 @@ module "master-mig" {
   zone              = "${var.zone}"
   network           = "${var.network}"
   subnetwork        = "${var.subnetwork}"
-  network_ip        = "${var.master_ip}"
+  network_ip        = "${var.master_ip == "" ? lookup(var.region_params["${var.region}"], "master_ip") : var.master_ip}"
   access_config     = "${var.access_config}"
   can_ip_forward    = true
   size              = 1
   compute_image     = "${var.compute_image}"
   machine_type      = "${var.master_machine_type}"
-  target_tags       = ["${concat(list("k8s-${var.name}"), var.add_tags)}"]
+  target_tags       = ["${concat(list("${random_id.instance-prefix.hex}"), var.add_tags)}"]
   service_port      = 80
   service_port_name = "http"
 
@@ -156,7 +164,7 @@ module "default-pool-mig" {
   source            = "github.com/GoogleCloudPlatform/terraform-google-managed-instance-group"
   name              = "${random_id.instance-prefix.hex}-default-pool"
   region            = "${var.region}"
-  zone              = "${var.zone}"
+  zonal             = false
   network           = "${var.network}"
   subnetwork        = "${var.subnetwork}"
   access_config     = "${var.access_config}"
@@ -164,7 +172,7 @@ module "default-pool-mig" {
   size              = "${var.num_nodes}"
   compute_image     = "${var.compute_image}"
   machine_type      = "${var.node_machine_type}"
-  target_tags       = ["${concat(list("k8s-${var.name}"), var.add_tags)}"]
+  target_tags       = ["${concat(list("${random_id.instance-prefix.hex}"), var.add_tags)}"]
   service_port      = 80
   service_port_name = "http"
 

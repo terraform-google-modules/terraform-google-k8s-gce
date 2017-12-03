@@ -34,15 +34,19 @@ variable cluster_name {
   default = "dev"
 }
 
+variable k8s_version {
+  default = "1.8.4"
+}
+
 module "k8s" {
   source           = "../../"
   name             = "${var.cluster_name}"
   network          = "default"
   region           = "${var.region}"
   zone             = "${var.zone}"
-  k8s_version      = "1.8.1"
+  k8s_version      = "${var.k8s_version}"
   access_config    = []
-  add_tags         = ["nat-us-central1"]
+  add_tags         = ["nat-${var.region}"]
   pod_network_type = "kubenet"
   num_nodes        = "${var.num_nodes}"
   depends_id       = "${join(",", list(module.nat.depends_id, null_resource.route_cleanup.id))}"

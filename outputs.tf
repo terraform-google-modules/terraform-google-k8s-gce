@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 output master_ip {
   description = "The internal address of the master"
-  value       = "${var.master_ip}"
+  value       = "${var.master_ip == "" ? lookup(var.region_params["${var.region}"], "master_ip") : var.master_ip}"
 }
 
 output depends_id {

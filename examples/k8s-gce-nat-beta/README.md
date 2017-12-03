@@ -1,6 +1,6 @@
-# Kubernetes Cluster on GCE Example
+# Kubernetes Cluster on GCE Example with beta Kubernetes
 
-This example creates a Kunbernetes cluster on Compute Engine.
+This example creates a Kunbernetes cluster on Compute Engine with an unreleased version of Kubernetes.
 
 **Figure 1.** *diagram of Google Cloud resources*
 
@@ -111,14 +111,6 @@ Open dashboard:
 
 ```
 open http://localhost:8001/ui
-```
-
-## (Optional) Trying a alpha or beta release
-
-To try a beta release, set the `k8s_version_override` variable.
-
-```
-echo 'k8s_version_override = "1.9.0-beta.1"' >> terraform.tfvars
 ```
 
 ## Cleanup

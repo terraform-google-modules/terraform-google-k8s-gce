@@ -31,26 +31,39 @@ variable num_nodes {
 }
 
 variable cluster_name {
-  default = "dev"
+  default = "beta"
 }
 
 variable k8s_version {
+  // This is the base package version installed with apt-get.
+  // The k8s_version_override version will be installed afterwards.
   default = "1.8.4"
 }
 
+variable k8s_version_override {
+  default = "1.9.0-beta.1"
+}
+
 module "k8s" {
-  source           = "../../"
-  name             = "${var.cluster_name}"
-  network          = "default"
-  region           = "${var.region}"
-  zone             = "${var.zone}"
-  k8s_version      = "${var.k8s_version}"
-  access_config    = []
-  add_tags         = ["nat-${var.region}"]
-  pod_network_type = "calico"
-  calico_version   = "2.6"
-  num_nodes        = "${var.num_nodes}"
-  depends_id       = "${join(",", list(module.nat.depends_id, null_resource.route_cleanup.id))}"
+  source               = "../../"
+  name                 = "${var.cluster_name}"
+  network              = "default"
+  region               = "${var.region}"
+  zone                 = "${var.zone}"
+  k8s_version          = "${var.k8s_version}"
+  access_config        = []
+  add_tags             = ["nat-${var.region}"]
+  pod_network_type     = "calico"
+  calico_version       = "2.6"
+  num_nodes            = "${var.num_nodes}"
+  depends_id           = "${join(",", list(module.nat.depends_id, null_resource.route_cleanup.id))}"
+  k8s_version_override = "${var.k8s_version_override}"
+
+  // add VolumeScheduling feature gate
+  feature_gates        = "AllAlpha=true,RotateKubeletServerCertificate=false,RotateKubeletClientCertificate=false,ExperimentalCriticalPodAnnotation=true,VolumeScheduling=true"
+
+  // Enable alpha-features passed to gce.conf cloud provider config.
+  gce_conf_add         = "alpha-features = DiskAlphaAPI"
 }
 
 module "nat" {

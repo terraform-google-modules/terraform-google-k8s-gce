@@ -24,9 +24,11 @@ terraform apply
 SSH into master through the nat gateway
 
 ```
+export REGION=us-central1
 gcloud compute ssh --ssh-flag="-A" \
-  $(gcloud compute instances list --filter=nat-gateway-us-central --uri) \
-  -- ssh $(gcloud compute instances list --filter='name~k8s-.*master.*' --format='get(name)')
+  $(gcloud compute instances list --filter=nat-gateway-${REGION} --uri) \
+  -- ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+  $(gcloud compute instances list --filter='name~k8s-.*master.*' --format='get(name)')
 ```
 
 Wait for kubeadm to complete:
@@ -80,9 +82,11 @@ until curl -sf http://$(kubectl get ing basic-ingress -o jsonpath='{.status.load
 Copy the cluster credentials to your local host:
 
 ```
+export REGION=us-central1
 gcloud compute ssh --ssh-flag="-A" \
-  $(gcloud compute instances list --filter=nat-gateway-us-central --uri) \
-  -- ssh $(gcloud compute instances list --filter='name~k8s-.*master.*' --format='get(name)') \
+  $(gcloud compute instances list --filter=nat-gateway-${REGION} --uri) \
+  -- ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+    $(gcloud compute instances list --filter='name~k8s-.*master.*' --format='get(name)') \
     sudo cat /etc/kubernetes/admin.conf | \
     sed "s/$(terraform output -module k8s |grep master_ip | cut -d= -f2 | tr -d ' ')/127.0.0.1/g" \
     > ${HOME}/.kube/config
@@ -91,9 +95,10 @@ gcloud compute ssh --ssh-flag="-A" \
 Create port-forward to apiserver:
 
 ```
-gcloud compute ssh --ssh-flag="-A -N -v" \
-  $(gcloud compute instances list --filter=nat-gateway-us-central --uri) \
-  -- "-L 6443:$(gcloud compute instances list --filter='name~k8s-.*master.*' --format='get(name)'):6443"
+export REGION=us-central1
+gcloud compute ssh --ssh-flag="-A -L 6443:localhost:6443" \
+  $(gcloud compute instances list --filter=nat-gateway-${REGION} --uri) \
+  -- ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -L 6443:localhost:6443 $(gcloud compute instances list --filter='name~k8s-.*master.*' --format='get(name)')
 ```
 
 Start kube proxy
@@ -106,6 +111,14 @@ Open dashboard:
 
 ```
 open http://localhost:8001/ui
+```
+
+## (Optional) Trying a alpha or beta release
+
+To try a beta release, set the `k8s_version_override` variable.
+
+```
+echo 'k8s_version_override = "1.9.0-beta.1"' >> terraform.tfvars
 ```
 
 ## Cleanup

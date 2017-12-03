@@ -22,7 +22,11 @@ controllerManagerExtraArgs:
   cloud-config: /etc/kubernetes/pki/gce.conf
   cluster-cidr: ${pod_cidr}
   service-cluster-ip-range: ${service_cidr}
-  feature-gates: AllAlpha=true,RotateKubeletServerCertificate=false,RotateKubeletClientCertificate=false,ExperimentalCriticalPodAnnotation=true
+  feature-gates: ${feature_gates}
+schedulerExtraArgs:
+  feature-gates: ${feature_gates}
+apiServerExtraArgs:
+  feature-gates: ${feature_gates}
 EOF
 chmod 0600 /etc/kubernetes/kubeadm.conf
 
@@ -38,6 +42,11 @@ if [ "${pod_network_type}" == "calico" ]; then
   kubectl apply -f https://docs.projectcalico.org/v${calico_version}/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
   kubectl apply -f https://docs.projectcalico.org/v${calico_version}/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/$${manifest_version}/calico.yaml
 fi
+
+# ClusterRoleBiding for persistent volume provisioner.
+kubectl create clusterrolebinding system:controller:persistent-volume-provisioner \
+  --clusterrole=system:persistent-volume-provisioner \
+  --user system:serviceaccount:kube-system:pvc-protection-controller
 
 # kubeadm manages the manifests directory, so add configmap after the init returns.
 kubectl create -f - <<'EOF'
