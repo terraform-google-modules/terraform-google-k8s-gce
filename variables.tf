@@ -45,7 +45,7 @@ variable cni_version {
 
 variable docker_version {
   description = "The version of Docker to install. See available versions using: `apt-cache madison docker-ce`"
-  default     = "17.09.0"
+  default     = "17.12.1"
 }
 
 variable calico_version {
@@ -65,7 +65,7 @@ variable gce_conf_add {
 
 variable compute_image {
   description = "The project/image to use on the master and nodes. Must be ubuntu or debian 8+ compatible."
-  default     = "ubuntu-os-cloud/ubuntu-1704"
+  default     = "ubuntu-os-cloud/ubuntu-1710"
 }
 
 variable network {
