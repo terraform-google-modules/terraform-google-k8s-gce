@@ -25,11 +25,11 @@ variable cluster_uid {
 
 variable k8s_version {
   description = "The version of kubernetes to use. See available versions using: `apt-cache madison kubelet`"
-  default     = "1.8.4"
+  default     = "1.9.4"
 }
 
 variable k8s_version_override {
-  description = "Install a different (alpha or beta) version of k8s. This is installs the versioned binaries on top of the k8s_version packages from apt-get. If not provided, var.k8s_version is used"
+  description = "Install a different (alpha or beta) version of k8s. This is installs the versioned binaries on top of the k8s_version packages from apt-get. Run 'gsutil ls gs://kubernetes-release/release' to list available verions. If not provided, var.k8s_version is used."
   default     = ""
 }
 
@@ -40,12 +40,12 @@ variable dashboard_version {
 
 variable cni_version {
   description = "The version of the kubernetes cni resources to install. See available versions using: `apt-cache madison kubernetes-cni`"
-  default     = "0.5.1"
+  default     = "0.6.0"
 }
 
 variable docker_version {
   description = "The version of Docker to install. See available versions using: `apt-cache madison docker-ce`"
-  default     = "17.09.0"
+  default     = "17.\\*"
 }
 
 variable calico_version {
@@ -65,7 +65,7 @@ variable gce_conf_add {
 
 variable compute_image {
   description = "The project/image to use on the master and nodes. Must be ubuntu or debian 8+ compatible."
-  default     = "ubuntu-os-cloud/ubuntu-1704"
+  default     = "ubuntu-os-cloud/ubuntu-1710"
 }
 
 variable network {
