@@ -1,4 +1,4 @@
-# Kubernetes Cluster on GCE Example
+# Kubernetes Cluster on GCE Example with NAT Gateway 
 
 This example creates a Kunbernetes cluster on Compute Engine.
 

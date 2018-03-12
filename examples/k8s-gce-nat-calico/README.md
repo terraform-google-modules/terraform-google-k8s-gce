@@ -1,4 +1,4 @@
-# Kubernetes Cluster on GCE Example with Calico CNI Networking
+# Kubernetes Cluster on GCE Example with NAT Gateway and Calico CNI Networking
 
 This example creates a Kunbernetes cluster on Compute Engine.
 

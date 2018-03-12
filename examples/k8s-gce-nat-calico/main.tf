@@ -35,7 +35,7 @@ variable cluster_name {
 }
 
 variable k8s_version {
-  default = "1.8.4"
+  default = "1.9.4"
 }
 
 module "k8s" {
