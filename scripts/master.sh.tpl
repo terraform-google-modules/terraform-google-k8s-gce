@@ -14,6 +14,8 @@ authorizationModes:
 - RBAC
 apiServerCertSANs:
 - 127.0.0.1
+featureGates:
+  Auditing: true
 controllerManagerExtraArgs:
   cluster-name: ${instance_prefix}
   allocate-node-cidrs: "true"
@@ -27,8 +29,27 @@ schedulerExtraArgs:
   feature-gates: ${feature_gates}
 apiServerExtraArgs:
   feature-gates: ${feature_gates}
+auditPolicy:
+  path: "/etc/kubernetes/audit-policy.yaml"
+  logDir: "/var/log/audit"
+  logMaxAge: 10
 EOF
 chmod 0600 /etc/kubernetes/kubeadm.conf
+
+cat <<EOPOLICY > /etc/kubernetes/audit-policy.yaml
+apiVersion: audit.k8s.io/v1beta1
+kind: Policy
+omitStages:
+  - "RequestReceived"
+rules:
+- level: RequestResponse
+  resources:
+  - group: "" # core
+    resources: ["pods", "secrets"]
+  - group: "extensions"
+    resources: ["deployments"]
+EOPOLICY
+chmod 0600 /etc/kubernetes/audit-policy.yaml
 
 kubeadm init --config /etc/kubernetes/kubeadm.conf
 

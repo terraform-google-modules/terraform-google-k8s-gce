@@ -55,7 +55,7 @@ variable calico_version {
 
 variable feature_gates {
   description = "Comma separated list of feature gates to enable"
-  default     = "AllAlpha=true,RotateKubeletServerCertificate=false,RotateKubeletClientCertificate=false,ExperimentalCriticalPodAnnotation=true"
+  default     = "AllAlpha=true,RotateKubeletServerCertificate=false,RotateKubeletClientCertificate=false,ExperimentalCriticalPodAnnotation=true,AdvancedAuditing=true"
 }
 
 variable gce_conf_add {
