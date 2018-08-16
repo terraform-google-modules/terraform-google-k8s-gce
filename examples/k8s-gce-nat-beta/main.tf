@@ -37,11 +37,11 @@ variable cluster_name {
 variable k8s_version {
   // This is the base package version installed with apt-get.
   // The k8s_version_override version will be installed afterwards.
-  default = "1.8.4"
+  default = "1.9.4"
 }
 
 variable k8s_version_override {
-  default = "1.9.0-beta.1"
+  default = "1.9.5-beta.0"
 }
 
 module "k8s" {

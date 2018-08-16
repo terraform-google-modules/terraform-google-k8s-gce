@@ -24,7 +24,7 @@ terraform apply
 SSH into master through the nat gateway
 
 ```
-export REGION=us-central1
+export REGION=us-west1
 gcloud compute ssh --ssh-flag="-A" \
   $(gcloud compute instances list --filter=nat-gateway-${REGION} --uri) \
   -- ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
