@@ -136,7 +136,8 @@ data "template_cloudinit_config" "node" {
 }
 
 module "master-mig" {
-  source            = "github.com/GoogleCloudPlatform/terraform-google-managed-instance-group"
+  source            = "GoogleCloudPlatform/managed-instance-group/google"
+  version           = "1.1.13"
   name              = "${random_id.instance-prefix.hex}-master"
   region            = "${var.region}"
   zone              = "${var.zone}"
@@ -151,6 +152,7 @@ module "master-mig" {
   target_tags       = ["${concat(list("${random_id.instance-prefix.hex}"), var.add_tags)}"]
   service_port      = 80
   service_port_name = "http"
+  http_health_check = false
 
   metadata {
     user-data          = "${data.template_cloudinit_config.master.rendered}"
@@ -161,7 +163,8 @@ module "master-mig" {
 }
 
 module "default-pool-mig" {
-  source            = "github.com/GoogleCloudPlatform/terraform-google-managed-instance-group"
+  source            = "GoogleCloudPlatform/managed-instance-group/google"
+  version           = "1.1.13"
   name              = "${random_id.instance-prefix.hex}-default-pool"
   region            = "${var.region}"
   zonal             = false
@@ -175,6 +178,7 @@ module "default-pool-mig" {
   target_tags       = ["${concat(list("${random_id.instance-prefix.hex}"), var.add_tags)}"]
   service_port      = 80
   service_port_name = "http"
+  http_health_check = false
 
   metadata {
     user-data          = "${data.template_cloudinit_config.node.rendered}"
