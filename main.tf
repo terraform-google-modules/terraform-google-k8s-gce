@@ -137,7 +137,7 @@ data "template_cloudinit_config" "node" {
 
 module "master-mig" {
   source            = "GoogleCloudPlatform/managed-instance-group/google"
-  version           = "1.1.13"
+  version           = "1.1.14"
   name              = "${random_id.instance-prefix.hex}-master"
   region            = "${var.region}"
   zone              = "${var.zone}"
@@ -164,7 +164,7 @@ module "master-mig" {
 
 module "default-pool-mig" {
   source            = "GoogleCloudPlatform/managed-instance-group/google"
-  version           = "1.1.13"
+  version           = "1.1.14"
   name              = "${random_id.instance-prefix.hex}-default-pool"
   region            = "${var.region}"
   zonal             = false
