@@ -65,7 +65,7 @@ variable gce_conf_add {
 
 variable compute_image {
   description = "The project/image to use on the master and nodes. Must be ubuntu or debian 8+ compatible."
-  default     = "ubuntu-os-cloud/ubuntu-1710"
+  default     = "ubuntu-os-cloud/ubuntu-1810"
 }
 
 variable network {
