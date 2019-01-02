@@ -51,7 +51,7 @@ touch /var/log/glbc.log
 sudo apt-get install -y \
   jq \
   nginx \
-  docker-ce=${docker_version}* \
+  docker.io=${docker_version}* \
   kubernetes-cni=${cni_version}* \
   kubelet=${k8s_version}* \
   kubeadm=${k8s_version}* \

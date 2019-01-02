@@ -25,7 +25,7 @@ variable cluster_uid {
 
 variable k8s_version {
   description = "The version of kubernetes to use. See available versions using: `apt-cache madison kubelet`"
-  default     = "1.9.4"
+  default     = "1.11.6-00"
 }
 
 variable k8s_version_override {
@@ -35,7 +35,7 @@ variable k8s_version_override {
 
 variable dashboard_version {
   description = "The version tag of the kubernetes dashboard, per the tags in the repo: https://github.com/kubernetes/dashboard"
-  default     = "v1.6.3"
+  default     = "v1.10.1"
 }
 
 variable cni_version {
@@ -45,7 +45,7 @@ variable cni_version {
 
 variable docker_version {
   description = "The version of Docker to install. See available versions using: `apt-cache madison docker-ce`"
-  default     = "17.\\*"
+  default     = "18.\\*"
 }
 
 variable calico_version {
