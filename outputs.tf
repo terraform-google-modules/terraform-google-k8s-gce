@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-output master_ip {
+output "master_ip" {
   description = "The internal address of the master"
-  value       = "${var.master_ip == "" ? lookup(var.region_params["${var.region}"], "master_ip") : var.master_ip}"
+  value       = var.master_ip == "" ? var.region_params[var.region]["master_ip"] : var.master_ip
 }
 
-output depends_id {
+output "depends_id" {
   description = "Value that can be used for intra-module dependency creation."
-  value       = "${module.master-mig.depends_id}"
+  value       = module.master-mig.depends_id
 }
+
