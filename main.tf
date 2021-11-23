@@ -70,6 +70,11 @@ data "template_file" "shutdown-script" {
   template = "${file("${format("%s/scripts/shutdown.sh.tpl", path.module)}")}"
 }
 
+data "template_file" "shutdown-script" {
+  // Used for clean shutdown and helps with autoscaling.
+  template = "${file("${format("%s/scripts/shutdown.sh.tpl", path.module)}")}"
+}
+
 resource "random_id" "token-part-1" {
   byte_length = 3
 }
